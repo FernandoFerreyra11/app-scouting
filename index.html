@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mac Allister Scouting Pro — Boceto App Pruebas Masivas</title>
+  <style>
+    :root {
+      --navy: #0F172A;
+      --blue: #1E3A8A;
+      --gold: #D97706;
+      --red: #B91C1C;
+      --green: #15803D;
+      --bg: #F1F5F9;
+      --card: #FFFFFF;
+      --text: #0F172A;
+      --muted: #475569;
+      --border: #CBD5E1;
+    }
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--text); padding: 16px; }
+    .container { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+    .header { background: var(--navy); color: #fff; border-radius: 12px; padding: 16px 20px; border-bottom: 4px solid var(--gold); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+    .badge-proto { background: var(--gold); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px; }
+    .status-offline { color: #86EFAC; font-size: 12px; font-weight: 600; margin-left: 8px; }
+    .header h1 { margin: 6px 0 2px; font-size: 20px; }
+    .header p { margin: 0; font-size: 12px; color: #CBD5E1; }
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: var(--card); padding: 6px; border-radius: 10px; border: 1px solid var(--border); }
+    .tab-btn { border: none; padding: 10px; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; background: transparent; color: var(--muted); transition: all .15s; }
+    .tab-btn.active { background: var(--blue); color: #fff; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+    .card-title { font-size: 15px; font-weight: 700; color: var(--navy); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    input, select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: #fff; color: var(--text); }
+    .slider-box { background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+    .slider-head { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; margin-bottom: 6px; }
+    .slider-val { color: var(--blue); font-family: monospace; font-size: 14px; }
+    input[type="range"] { width: 100%; padding: 0; accent-color: var(--blue); cursor: pointer; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .tag-btn { background: #F8FAFC; border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 11.5px; cursor: pointer; font-weight: 600; color: var(--navy); }
+    .tag-btn:hover { border-color: var(--blue); background: #EFF6FF; }
+    .btn-primary { background: var(--blue); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .btn-primary:hover { opacity: 0.92; }
+    .btn-secondary { background: #fff; color: var(--navy); border: 1px solid var(--border); padding: 9px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .hidden { display: none !important; }
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    th { text-align: left; padding: 10px 8px; border-bottom: 2px solid var(--border); color: var(--muted); }
+    td { padding: 10px 8px; border-bottom: 1px solid #E2E8F0; }
+    .pill { padding: 3px 8px; border-radius: 12px; font-size: 10.5px; font-weight: 700; display: inline-block; }
+    .pill-pre { background: #DCFCE7; color: #166534; }
+    .pill-seg { background: #FEF3C7; color: #92400E; }
+    .bar-track { height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+    .bar-fill { height: 100%; background: var(--blue); }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 99; }
+    @media print { .no-print { display: none !important; } body { background: #fff; padding: 0; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header no-print">
+      <div>
+        <div>
+          <span class="badge-proto">BOCETO INTERACTIVO v1.0</span>
+          <span class="status-offline">● Modo Campo Offline Activo (LocalStorage)</span>
+        </div>
+        <h1>Mac Allister Scouting — App Pruebas Masivas</h1>
+        <p>Propuesta Operativa DT Fernando Ferreyra (Téc. Informática) — Carga ágil en cancha en &lt; 60 seg</p>
+      </div>
+      <div>
+        <label style="color:#CBD5E1;">Sede del Campus:</label>
+        <select id="sedeGlobal" style="width:200px;">
+          <option value="Chaco - Resistencia">Chaco - Resistencia</option>
+          <option value="Misiones - Posadas">Misiones - Posadas</option>
+          <option value="La Pampa - Ruta 5">La Pampa - Ruta 5</option>
+          <option value="CABA / GBA">CABA / GBA</option>
+        </select>
+      </div>
+    </header>
+
+    <nav class="tabs no-print">
+      <button id="tab-carga" class="tab-btn active" onclick="switchTab('carga')">1. Carga Rápida en Cancha</button>
+      <button id="tab-base" class="tab-btn" onclick="switchTab('base')">2. Base &amp; Ranking (<span id="count-badge">4</span>)</button>
+      <button id="tab-ficha" class="tab-btn" onclick="switchTab('ficha')">3. Ficha Exportable &amp; Clip</button>
+    </nav>
+
+    <div id="toast" class="toast hidden">✓ Jugador guardado en base local</div>
+
+    <!-- VISTA 1 -->
+    <section id="view-carga" class="card">
+      <div class="card-title">
+        <span>Registro de Juvenil en Prueba</span>
+        <span style="font-size:12px; color:var(--gold);">Promedio en vivo: <strong id="live-avg">4.4</strong> / 5.0</span>
+      </div>
+
+      <div class="grid-4">
+        <div>
+          <label>Pechera N°</label>
+          <input id="f-pechera" type="number" value="18" />
+        </div>
+        <div style="grid-column: span 2;">
+          <label>Nombre y Apellido</label>
+          <input id="f-nombre" type="text" value="Mateo Domínguez" placeholder="Ej: Mateo Domínguez" />
+        </div>
+        <div>
+          <label>Categoría</label>
+          <select id="f-cat">
+            <option value="2009">Cat. 2009</option>
+            <option value="2010" selected>Cat. 2010</option>
+            <option value="2011">Cat. 2011</option>
+            <option value="2012">Cat. 2012</option>
+            <option value="2013">Cat. 2013</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div>
+          <label>Puesto Principal</label>
+          <select id="f-puesto">
+            <option value="Volante Central (#5)">Volante Central (#5)</option>
+            <option value="Interior Mixto (#8/#10)">Interior Mixto (#8/#10)</option>
+            <option value="Extremo (#7/#11)">Extremo (#7/#11)</option>
+            <option value="Delantero Centro (#9)">Delantero Centro (#9)</option>
+            <option value="Marcador Central (#2/#6)">Marcador Central (#2/#6)</option>
+            <option value="Lateral (#4/#3)">Lateral (#4/#3)</option>
+            <option value="Arquero (#1)">Arquero (#1)</option>
+          </select>
+        </div>
+        <div>
+          <label>Pie Hábil</label>
+          <select id="f-pie">
+            <option value="Derecho">Derecho</option>
+            <option value="Izquierdo">Izquierdo</option>
+            <option value="Ambidiestro">Ambidiestro</option>
+          </select>
+        </div>
+        <div>
+          <label>Biotipo / Maduración</label>
+          <select id="f-biotipo">
+            <option value="Armónico (PHV=)">Armónico (PHV=)</option>
+            <option value="Desarrollado (PHV+)">Desarrollado (PHV+)</option>
+            <option value="Tardío / Liviano (PHV-)">Tardío / Liviano (PHV-)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 14px;">
+        <div class="slider-box">
+          <div class="slider-head"><span>1. Técnica en Velocidad &amp; Perfil</span><span id="val-p1" class="slider-val">4.5</span></div>
+          <input id="p1" type="range" min="1" max="5" step="0.5" value="4.5" oninput="updateScores()" />
+        </div>
+        <div class="slider-box">
+          <div class="slider-head"><span>2. Toma de Decisiones &amp; Lectura</span><span id="val-p2" class="slider-val">4.5</span></div>
+          <input id="p2" type="range" min="1" max="5" step="0.5" value="4.5" oninput="updateScores()" />
+        </div>
+        <div class="slider-box">
+          <div class="slider-head"><span>3. Capacidad Condicional &amp; Duelos</span><span id="val-p3" class="slider-val">4.0</span></div>
+          <input id="p3" type="range" min="1" max="5" step="0.5" value="4.0" oninput="updateScores()" />
+        </div>
+        <div class="slider-box">
+          <div class="slider-head"><span>4. Mentalidad &amp; Personalidad</span><span id="val-p4" class="slider-val">4.5</span></div>
+          <input id="p4" type="range" min="1" max="5" step="0.5" value="4.5" oninput="updateScores()" />
+        </div>
+      </div>
+
+      <label>Etiquetas Rápidas de Campo (clic para sumar):</label>
+      <div class="tags">
+        <button type="button" class="tag-btn" onclick="addTag('Control orientado limpio')">+ Control orientado</button>
+        <button type="button" class="tag-btn" onclick="addTag('Pase filtrado vertical')">+ Pase filtrado</button>
+        <button type="button" class="tag-btn" onclick="addTag('Buen 1v1 defensivo')">+ Buen 1v1</button>
+        <button type="button" class="tag-btn" onclick="addTag('Perfil abierto previo')">+ Perfil abierto</button>
+        <button type="button" class="tag-btn" onclick="addTag('Liderazgo y voz de mando')">+ Liderazgo</button>
+        <button type="button" class="tag-btn" onclick="addTag('Presión tras pérdida')">+ Presión tras pérdida</button>
+      </div>
+      <textarea id="f-obs" rows="2">Volante con lectura previa superior. No se esconde en salida bajo presión.</textarea>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:14px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <label style="margin:0;">Dictamen:</label>
+          <select id="f-dictamen" style="width:180px; font-weight:700;">
+            <option value="PRESELECCIONADO">PRESELECCIONADO</option>
+            <option value="SEGUIMIENTO">SEGUIMIENTO</option>
+            <option value="OBSERVADO">OBSERVADO</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="savePlayer()">+ GUARDAR EN BASE DE DATOS</button>
+      </div>
+    </section>
+
+    <!-- VISTA 2 -->
+    <section id="view-base" class="card hidden">
+      <div class="card-title">
+        <span>Base Centralizada de Campus Evaluados</span>
+        <div style="display:flex; gap:8px;">
+          <select id="filter-cat" onchange="renderTable()" style="width:130px;">
+            <option value="ALL">Todas Cat.</option>
+            <option value="2009">Cat. 2009</option>
+            <option value="2010">Cat. 2010</option>
+            <option value="2011">Cat. 2011</option>
+            <option value="2012">Cat. 2012</option>
+          </select>
+          <select id="filter-status" onchange="renderTable()" style="width:155px;">
+            <option value="ALL">Todos Estados</option>
+            <option value="PRESELECCIONADO">Preseleccionados</option>
+            <option value="SEGUIMIENTO">Seguimiento</option>
+          </select>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Pech.</th><th>Jugador</th><th>Cat.</th><th>Puesto</th><th>Sede</th><th>Puntaje</th><th>Dictamen</th><th style="text-align:right;">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="players-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VISTA 3 -->
+    <section id="view-ficha" class="hidden" style="display:flex; flex-direction:column; gap:12px;">
+      <div class="card no-print" style="padding:12px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <span style="font-size:13px;">Reporte seleccionado: <strong id="rep-title-name">—</strong></span>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-secondary" onclick="copyWhatsApp()">Copiar Resumen WhatsApp</button>
+          <button class="btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; border-bottom:2px solid var(--navy); padding-bottom:12px; margin-bottom:14px;">
+          <div>
+            <div style="font-size:11px; font-weight:700; color:var(--blue); letter-spacing:0.5px;">CLUB DEPORTIVO MAC ALLISTER — REPORTE DE CAPTACIÓN</div>
+            <h2 id="ficha-nombre" style="margin:4px 0 4px; font-size:20px;">—</h2>
+            <div id="ficha-sub" style="font-size:12.5px; color:var(--muted);">—</div>
+          </div>
+          <div style="text-align:right;">
+            <span id="ficha-badge" class="pill pill-pre">—</span>
+            <div style="font-size:12.5px; margin-top:6px;">Puntaje General: <strong id="ficha-avg" style="font-size:15px;">—</strong> / 5.0</div>
+          </div>
+        </div>
+
+        <div id="ficha-bars" class="grid-2" style="margin-bottom:14px;"></div>
+
+        <div style="background:#FEF3C7; border:1px solid var(--gold); border-radius:8px; padding:10px 14px; font-size:12.5px; margin-bottom:14px;">
+          <strong>OBSERVACIONES DE CAMPO:</strong>
+          <p id="ficha-obs" style="margin:4px 0 0; font-style:italic;">—</p>
+        </div>
+
+        <div style="background:#F8FAFC; border:1px solid var(--border); border-left:4px solid var(--red); border-radius:8px; padding:12px 14px; font-size:12px;">
+          <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:8px;">
+            <span>COMPACTO AUDIOVISUAL ASOCIADO (CLIP 60 SEG)</span>
+            <span style="color:var(--blue);">MP4 / Enlace Exportable</span>
+          </div>
+          <div class="grid-3" style="margin-bottom:0;">
+            <div style="background:#fff; border:1px solid var(--border); padding:8px; border-radius:6px;">▶ <strong>00:08</strong> — Control orientado y pase vertical</div>
+            <div style="background:#fff; border:1px solid var(--border); padding:8px; border-radius:6px;">▶ <strong>00:26</strong> — Recuperación tras pérdida</div>
+            <div style="background:#fff; border:1px solid var(--border); padding:8px; border-radius:6px;">▶ <strong>00:47</strong> — Cambio de frente preciso</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const defaultPlayers = [
+      { id: 1, pechera: 14, nombre: "Thiago Benítez", cat: "2010", puesto: "Volante Central (#5)", pie: "Derecho", biotipo: "Armónico (PHV=)", sede: "Chaco - Resistencia", p1: 4.5, p2: 5.0, p3: 4.0, p4: 4.5, dictamen: "PRESELECCIONADO", obs: "Lectura previa superior. Domina los tiempos de salida bajo presión y filtra pases con facilidad." },
+      { id: 2, pechera: 7, nombre: "Luciano Maidana", cat: "2011", puesto: "Extremo (#7/#11)", pie: "Izquierdo", biotipo: "Tardío / Liviano (PHV-)", sede: "Misiones - Posadas", p1: 4.5, p2: 4.0, p3: 4.5, p4: 4.0, dictamen: "PRESELECCIONADO", obs: "Desequilibrio 1v1 por banda y buena capacidad de centro al segundo palo en velocidad." },
+      { id: 3, pechera: 9, nombre: "Valentín Sosa", cat: "2009", puesto: "Delantero Centro (#9)", pie: "Derecho", biotipo: "Desarrollado (PHV+)", sede: "La Pampa - Ruta 5", p1: 4.0, p2: 4.0, p3: 4.5, p4: 4.5, dictamen: "SEGUIMIENTO", obs: "Buen juego de espaldas, rebota limpio hacia los interiores y ataca bien el primer palo." },
+      { id: 4, pechera: 2, nombre: "Bautista Herrera", cat: "2010", puesto: "Marcador Central (#2/#6)", pie: "Derecho", biotipo: "Desarrollado (PHV+)", sede: "Chaco - Resistencia", p1: 3.5, p2: 4.0, p3: 4.5, p4: 4.0, dictamen: "SEGUIMIENTO", obs: "Firme en el juego aéreo y agresivo en anticipo. A mejorar perfil en cambios de orientación." }
+    ];
+    let players = JSON.parse(localStorage.getItem('mac_allister_scouting_v1')) || defaultPlayers;
+    let selectedId = players[0]?.id || 1;
+    document.getElementById('count-badge').innerText = players.length;
+
+    function avg(p) { return ((p.p1 + p.p2 + p.p3 + p.p4) / 4).toFixed(1); }
+
+    function updateScores() {
+      const p1 = parseFloat(document.getElementById('p1').value);
+      const p2 = parseFloat(document.getElementById('p2').value);
+      const p3 = parseFloat(document.getElementById('p3').value);
+      const p4 = parseFloat(document.getElementById('p4').value);
+      document.getElementById('val-p1').innerText = p1.toFixed(1);
+      document.getElementById('val-p2').innerText = p2.toFixed(1);
+      document.getElementById('val-p3').innerText = p3.toFixed(1);
+      document.getElementById('val-p4').innerText = p4.toFixed(1);
+      document.getElementById('live-avg').innerText = ((p1 + p2 + p3 + p4) / 4).toFixed(1);
+    }
+
+    function addTag(txt) {
+      const box = document.getElementById('f-obs');
+      box.value = box.value.trim() ? box.value.trim() + " | " + txt : txt;
+    }
+
+    function savePlayer() {
+      const nombre = document.getElementById('f-nombre').value.trim();
+      if (!nombre) return alert("Por favor ingresa el nombre del juvenil.");
+      const p = {
+        id: Date.now(),
+        pechera: document.getElementById('f-pechera').value || "-",
+        nombre,
+        cat: document.getElementById('f-cat').value,
+        puesto: document.getElementById('f-puesto').value,
+        pie: document.getElementById('f-pie').value,
+        biotipo: document.getElementById('f-biotipo').value,
+        sede: document.getElementById('sedeGlobal').value,
+        p1: parseFloat(document.getElementById('p1').value),
+        p2: parseFloat(document.getElementById('p2').value),
+        p3: parseFloat(document.getElementById('p3').value),
+        p4: parseFloat(document.getElementById('p4').value),
+        dictamen: document.getElementById('f-dictamen').value,
+        obs: document.getElementById('f-obs').value.trim()
+      };
+      players.unshift(p);
+      localStorage.setItem('mac_allister_scouting_v1', JSON.stringify(players));
+      selectedId = p.id;
+      document.getElementById('count-badge').innerText = players.length;
+      document.getElementById('f-nombre').value = "";
+      document.getElementById('f-pechera').value = parseInt(p.pechera || 0) + 1;
+      const t = document.getElementById('toast');
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 2200);
+      renderTable();
+    }
+
+    function switchTab(tab) {
+      ['carga', 'base', 'ficha'].forEach(t => {
+        document.getElementById('view-' + t).classList.toggle('hidden', t !== tab);
+        document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+      });
+      if (tab === 'base') renderTable();
+      if (tab === 'ficha') renderFicha(selectedId);
+    }
+
+    function renderTable() {
+      const fCat = document.getElementById('filter-cat').value;
+      const fSt = document.getElementById('filter-status').value;
+      const filtered = players.filter(p => (fCat === 'ALL' || p.cat === fCat) && (fSt === 'ALL' || p.dictamen === fSt))
+                              .sort((a, b) => avg(b) - avg(a));
+      document.getElementById('players-tbody').innerHTML = filtered.map(p => `
+        <tr>
+          <td style="font-family:monospace; font-weight:700;">#${p.pechera}</td>
+          <td style="font-weight:700;">${p.nombre}</td>
+          <td>${p.cat}</td>
+          <td>${p.puesto}</td>
+          <td style="color:var(--muted);">${p.sede}</td>
+          <td style="font-family:monospace; font-weight:700;">${avg(p)}</td>
+          <td><span class="pill ${p.dictamen === 'PRESELECCIONADO' ? 'pill-pre' : 'pill-seg'}">${p.dictamen}</span></td>
+          <td style="text-align:right;"><button class="btn-secondary" style="padding:4px 10px;" onclick="openFicha(${p.id})">Ver Ficha</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function openFicha(id) { selectedId = id; switchTab('ficha'); }
+
+    function renderFicha(id) {
+      const p = players.find(x => x.id === id) || players[0];
+      document.getElementById('rep-title-name').innerText = p.nombre;
+      document.getElementById('ficha-nombre').innerText = `${p.nombre} (Pechera #${p.pechera})`;
+      document.getElementById('ficha-sub').innerText = `Cat. ${p.cat}  |  ${p.puesto}  |  Pie: ${p.pie}  |  ${p.biotipo}  |  Sede: ${p.sede}`;
+      document.getElementById('ficha-avg').innerText = avg(p);
+      const b = document.getElementById('ficha-badge');
+      b.innerText = p.dictamen;
+      b.className = `pill ${p.dictamen === 'PRESELECCIONADO' ? 'pill-pre' : 'pill-seg'}`;
+      document.getElementById('ficha-obs').innerText = p.obs || "Sin observaciones adicionales.";
+
+      const pillars = [
+        { label: "1. Técnica en Velocidad & Perfil", val: p.p1 },
+        { label: "2. Toma de Decisiones & Lectura", val: p.p2 },
+        { label: "3. Capacidad Condicional & Duelos", val: p.p3 },
+        { label: "4. Mentalidad & Personalidad", val: p.p4 }
+      ];
+      document.getElementById('ficha-bars').innerHTML = pillars.map(pil => `
+        <div class="slider-box">
+          <div class="slider-head"><span>${pil.label}</span><span class="slider-val">${pil.val.toFixed(1)} / 5.0</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(pil.val/5)*100}%"></div></div>
+        </div>
+      `).join('');
+    }
+
+    function copyWhatsApp() {
+      const p = players.find(x => x.id === selectedId) || players[0];
+      const msg = `*FICHA CAPTACIÓN MAC ALLISTER*\n*Jugador:* ${p.nombre} (#${p.pechera})\n*Cat:* ${p.cat} | *Puesto:* ${p.puesto}\n*Sede:* ${p.sede}\n*Puntaje:* ${avg(p)}/5.0 (${p.dictamen})\n*Obs:* ${p.obs}`;
+      navigator.clipboard?.writeText(msg);
+      alert("Resumen copiado listo para pegar en WhatsApp:\n\n" + msg);
+    }
+
+    updateScores();
+    renderTable();
+  </script>
+</body>
+</html>
+
